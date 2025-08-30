@@ -1,7 +1,8 @@
 import { Router } from "express";
-import { prisma } from "../prisma";
+import { supabase } from "../supabase";
 import { requireAuth, requireRole } from "../middlewares/auth";
 import { z } from "zod";
+import type { PostgrestSingleResponse } from "@supabase/supabase-js";
 
 const router = Router();
 
@@ -19,19 +20,38 @@ router.post("/", requireAuth, requireRole("EMPLOYER"), async (req: any, res) => 
   if (!parsed.success) return res.status(400).json(parsed.error.flatten());
   const { title, description, location, employment, requirements } = parsed.data;
 
-  const company = await prisma.company.findUnique({ where: { userId: req.user.id } });
+  const { data: company } = await supabase
+    .from("Company")
+    .select("id")
+    .eq("userId", req.user.id)
+    .single();
   if (!company) return res.status(400).json({ error: "Company profile not found" });
 
-  const job = await prisma.job.create({
-    data: { title, description, location, employment, companyId: company.id }
-  });
+  const { data: job, error } = await supabase
+    .from("Job")
+    .insert({ title, description, location, employment, companyId: company.id })
+    .select()
+    .single();
+  if (error || !job) return res.status(500).json({ error: error?.message });
 
   if (requirements.length) {
     const skills = await Promise.all(
-      requirements.map((name) => prisma.skill.upsert({ where: { name }, update: {}, create: { name } }))
+      requirements.map((name) =>
+        supabase
+          .from("Skill")
+          .upsert({ name }, { onConflict: "name" })
+          .select()
+          .single()
+      )
     );
     await Promise.all(
-      skills.map((s) => prisma.jobSkill.create({ data: { jobId: job.id, skillId: s.id, must: true } }))
+      skills.map((s: PostgrestSingleResponse<{ id: number }>) =>
+        s.data
+          ? supabase
+              .from("JobSkill")
+              .insert({ jobId: job.id, skillId: s.data.id, must: true })
+          : null
+      )
     );
   }
 
@@ -40,25 +60,37 @@ router.post("/", requireAuth, requireRole("EMPLOYER"), async (req: any, res) => 
 
 // Listar vagas (público)
 router.get("/", async (_req, res) => {
-  const jobs = await prisma.job.findMany({
-    include: { company: true, requirements: { include: { skill: true } } }
-  });
-  res.json(jobs);
+  const { data: jobs } = await supabase
+    .from("Job")
+    .select("*, company:Company(*), requirements:JobSkill(skill:Skill(*))");
+  res.json(jobs || []);
 });
 
 // Aplicar a vaga (CANDIDATE)
 router.post("/:id/apply", requireAuth, requireRole("CANDIDATE"), async (req: any, res) => {
   const jobId = req.params.id;
 
-  const profile = await prisma.candidateProfile.findUnique({ where: { userId: req.user.id } });
+  const { data: profile } = await supabase
+    .from("CandidateProfile")
+    .select("id")
+    .eq("userId", req.user.id)
+    .single();
   if (!profile) return res.status(400).json({ error: "Candidate profile not found" });
 
-  const job = await prisma.job.findUnique({ where: { id: jobId } });
+  const { data: job } = await supabase
+    .from("Job")
+    .select("id")
+    .eq("id", jobId)
+    .single();
   if (!job) return res.status(404).json({ error: "Job not found" });
 
-  const application = await prisma.application.create({
-    data: { jobId, candidateId: profile.id, status: "SUBMITTED" }
-  });
+  const { data: application, error } = await supabase
+    .from("Application")
+    .insert({ jobId, candidateId: profile.id, status: "SUBMITTED" })
+    .select()
+    .single();
+
+  if (error) return res.status(500).json({ error: error.message });
 
   res.status(201).json(application);
 });

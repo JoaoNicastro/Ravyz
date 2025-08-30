@@ -1,13 +1,17 @@
 import { Router } from "express";
-import { prisma } from "../prisma";
+import { supabase } from "../supabase";
 import { requireAuth, requireRole } from "../middlewares/auth";
 import { z } from "zod";
 
 const router = Router();
 
 router.get("/me", requireAuth, requireRole("EMPLOYER"), async (req: any, res) => {
-  const company = await prisma.company.findUnique({ where: { userId: req.user.id } });
-  res.json(company);
+  const { data } = await supabase
+    .from("Company")
+    .select("*")
+    .eq("userId", req.user.id)
+    .maybeSingle();
+  res.json(data);
 });
 
 const UpdateInput = z.object({
@@ -22,11 +26,16 @@ router.put("/me", requireAuth, requireRole("EMPLOYER"), async (req: any, res) =>
   if (!parsed.success) return res.status(400).json(parsed.error.flatten());
   const data = parsed.data;
 
-  const company = await prisma.company.upsert({
-    where: { userId: req.user.id },
-    update: { ...data },
-    create: { userId: req.user.id, name: data.name || "Company" }
-  });
+  const { data: company, error } = await supabase
+    .from("Company")
+    .upsert(
+      { userId: req.user.id, name: data.name || "Company", ...data },
+      { onConflict: "userId" }
+    )
+    .select()
+    .single();
+
+  if (error) return res.status(500).json({ error: error.message });
 
   res.json(company);
 });
