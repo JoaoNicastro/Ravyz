@@ -1,8 +1,7 @@
 import { Router } from "express";
-import { prisma } from "../prisma";                    // ajuste se seu export for diferente
+import { supabase } from "../supabase";                    // ajuste se seu export for diferente
 import { requireAuth, requireRole } from "../middlewares/auth";
 import { z } from "zod";
-import { Prisma } from "@prisma/client";
 
 const router = Router();
 
@@ -28,19 +27,10 @@ router.put("/me", requireAuth, requireRole("CANDIDATE"), async (req: any, res) =
   if (!parsed.success) return res.status(400).json(parsed.error.flatten());
   const d = parsed.data;
 
-  try {
-    const profile = await prisma.candidateProfile.upsert({
-      where: { userId: req.user.id },
-      update: {
-        fullName: d.fullName ?? undefined,
-        headline: d.headline ?? undefined,
-        bio: d.bio ?? undefined,
-        location: d.location ?? undefined,
-        cpf: d.cpf ?? undefined,
-        phone: d.phone ?? undefined,
-        address: d.address ?? undefined,
-      },
-      create: {
+  const { data: profile, error } = await supabase
+    .from("CandidateProfile")
+    .upsert(
+      {
         userId: req.user.id,
         fullName: d.fullName || "Candidate",
         headline: d.headline,
@@ -50,42 +40,66 @@ router.put("/me", requireAuth, requireRole("CANDIDATE"), async (req: any, res) =
         phone: d.phone,
         address: d.address,
       },
-    });
+      { onConflict: "userId" }
+    )
+    .select()
+    .single();
 
-    if (d.skills) {
-      const skills = await Promise.all(
-        d.skills.map((name) =>
-          prisma.skill.upsert({ where: { name }, update: {}, create: { name } })
-        )
-      );
-      await prisma.candidateSkill.deleteMany({ where: { candidateId: profile.id } });
-      await Promise.all(
-        skills.map((s) =>
-          prisma.candidateSkill.create({
-            data: { candidateId: profile.id, skillId: s.id, level: 3 },
-          })
-        )
-      );
-    }
-
-    res.json({ ok: true });
-  } catch (err: any) {
-    if (err instanceof Prisma.PrismaClientKnownRequestError && err.code === "P2002") {
-      // unique constraint (ex.: CPF duplicado)
+  if (error || !profile) {
+    if (error && error.code === "23505") {
       return res.status(409).json({ error: "CPF já cadastrado" });
     }
-    console.error(err);
-    res.status(500).json({ error: "Erro ao atualizar perfil" });
+    return res.status(500).json({ error: error?.message });
   }
+
+  if (d.skills) {
+    const skills = await Promise.all(
+      d.skills.map((name) =>
+        supabase
+          .from("Skill")
+          .upsert({ name }, { onConflict: "name" })
+          .select()
+          .single()
+      )
+    );
+    await supabase.from("CandidateSkill").delete().eq("candidateId", profile.id);
+    await Promise.all(
+      skills.map((s) =>
+        s.data
+          ? supabase
+              .from("CandidateSkill")
+              .insert({
+                candidateId: profile.id,
+                skillId: s.data.id,
+                level: 3,
+              })
+          : null
+      )
+    );
+  }
+
+  res.json({ ok: true });
 });
 
-router.get("/me/applications", requireAuth, requireRole("CANDIDATE"), async (req: any, res) => {
-  const apps = await prisma.application.findMany({
-    where: { candidate: { userId: req.user.id } },
-    include: { job: true },
-    orderBy: { createdAt: "desc" },
-  });
-  res.json(apps);
-});
+router.get(
+  "/me/applications",
+  requireAuth,
+  requireRole("CANDIDATE"),
+  async (req: any, res) => {
+    const { data: candidate } = await supabase
+      .from("CandidateProfile")
+      .select("id")
+      .eq("userId", req.user.id)
+      .single();
+    if (!candidate) return res.json([]);
+
+    const { data: apps } = await supabase
+      .from("Application")
+      .select("*, job:Job(*)")
+      .eq("candidateId", candidate.id)
+      .order("createdAt", { ascending: false });
+    res.json(apps || []);
+  }
+);
 
 export default router;

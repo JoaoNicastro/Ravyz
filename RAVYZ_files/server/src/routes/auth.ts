@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { prisma } from "../prisma";
+import { supabase } from "../supabase";
 import { z } from "zod";
 import { hashPassword, checkPassword } from "../auth/hash";
 import { signJwt } from "../auth/jwt";
@@ -18,26 +18,39 @@ router.post("/register", async (req, res) => {
 
   const { email, password, role } = parsed.data;
 
-  const exists = await prisma.user.findUnique({ where: { email } });
+  const { data: exists } = await supabase
+    .from("User")
+    .select("id")
+    .eq("email", email)
+    .maybeSingle();
+
   if (exists) return res.status(409).json({ error: "Email already registered" });
 
   const hashed = await hashPassword(password);
-  const user = await prisma.user.create({
-    data: { email, password: hashed, role },
-  });
+  const { data: user, error } = await supabase
+    .from("User")
+    .insert({ email, password: hashed, role })
+    .select()
+    .single();
+
+  if (error || !user) return res.status(500).json({ error: error?.message });
 
   if (role === "CANDIDATE") {
-    await prisma.candidateProfile.create({
-      data: { userId: user.id, fullName: email.split("@")[0] },
+    await supabase.from("CandidateProfile").insert({
+      userId: user.id,
+      fullName: email.split("@")[0],
     });
   } else {
-    await prisma.company.create({
-      data: { userId: user.id, name: email.split("@")[0] },
+    await supabase.from("Company").insert({
+      userId: user.id,
+      name: email.split("@")[0],
     });
   }
 
   const token = signJwt({ id: user.id, role: user.role });
-  res.status(201).json({ token, user: { id: user.id, email: user.email, role: user.role } });
+  res
+    .status(201)
+    .json({ token, user: { id: user.id, email: user.email, role: user.role } });
 });
 
 const LoginInput = z.object({
@@ -50,7 +63,11 @@ router.post("/login", async (req, res) => {
   if (!parsed.success) return res.status(400).json(parsed.error.flatten());
 
   const { email, password } = parsed.data;
-  const user = await prisma.user.findUnique({ where: { email } });
+  const { data: user } = await supabase
+    .from("User")
+    .select("id, email, password, role")
+    .eq("email", email)
+    .maybeSingle();
   if (!user) return res.status(401).json({ error: "Invalid credentials" });
 
   const ok = await checkPassword(password, user.password);
