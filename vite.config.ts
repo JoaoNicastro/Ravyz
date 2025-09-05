@@ -61,7 +61,7 @@ export default defineConfig({
         target: 'https://ravyz.app.n8n.cloud',
         changeOrigin: true,
         secure: false,
-        rewrite: p => p.replace(/^\/api\/n8n/, '/webhook-test'),
+        rewrite: p => p.replace(/^\/api\/n8n/, '/webhook'), // <-- agora usa produção
       },
     },
   },
