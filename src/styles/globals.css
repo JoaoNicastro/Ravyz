@@ -1,0 +1,251 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&display=swap');
+
+@custom-variant dark (&:is(.dark *));
+
+:root {
+  --font-size: 14px;
+  --background: #ffffff;
+  --foreground: #111111;
+  --card: #ffffff;
+  --card-foreground: #111111;
+  --popover: #ffffff;
+  --popover-foreground: #111111;
+  --primary: #FF7A00;
+  --primary-foreground: #ffffff;
+  --secondary: #E8E8E8;
+  --secondary-foreground: #111111;
+  --muted: #E8E8E8;
+  --muted-foreground: #8A8A8A;
+  --accent: #E8E8E8;
+  --accent-foreground: #111111;
+  --destructive: #d4183d;
+  --destructive-foreground: #ffffff;
+  --border: #E8E8E8;
+  --input: transparent;
+  --input-background: #f3f3f5;
+  --switch-background: #cbced4;
+  --font-weight-medium: 500;
+  --font-weight-normal: 400;
+  --font-weight-bold: 700;
+  --ring: #FF7A00;
+  --chart-1: #FF7A00;
+  --chart-2: #00A86B;
+  --chart-3: #6C4DFF;
+  --chart-4: #1477FF;
+  --chart-5: #444444;
+  --radius: 0.625rem;
+  --sidebar: #ffffff;
+  --sidebar-foreground: #111111;
+  --sidebar-primary: #FF7A00;
+  --sidebar-primary-foreground: #ffffff;
+  --sidebar-accent: #E8E8E8;
+  --sidebar-accent-foreground: #111111;
+  --sidebar-border: #E8E8E8;
+  --sidebar-ring: #FF7A00;
+  
+  /* RAVYZ Custom Colors */
+  --ravyz-orange: #FF7A00;
+  --ravyz-green: #00A86B;
+  --ravyz-purple: #6C4DFF;
+  --ravyz-blue: #1477FF;
+  --ravyz-black: #111111;
+  --ravyz-gray-700: #444444;
+  --ravyz-gray-500: #8A8A8A;
+  --ravyz-gray-200: #E8E8E8;
+  --ravyz-white: #FFFFFF;
+  
+  /* Typography Scales */
+  --text-xs: 12px;
+  --text-sm: 14px;
+  --text-base: 16px;
+  --text-lg: 20px;
+  --text-xl: 24px;
+  --text-2xl: 32px;
+}
+
+.dark {
+  --background: #111111;
+  --foreground: #ffffff;
+  --card: #111111;
+  --card-foreground: #ffffff;
+  --popover: #111111;
+  --popover-foreground: #ffffff;
+  --primary: #FF7A00;
+  --primary-foreground: #ffffff;
+  --secondary: #444444;
+  --secondary-foreground: #ffffff;
+  --muted: #444444;
+  --muted-foreground: #8A8A8A;
+  --accent: #444444;
+  --accent-foreground: #ffffff;
+  --destructive: #d4183d;
+  --destructive-foreground: #ffffff;
+  --border: #444444;
+  --input: #444444;
+  --ring: #FF7A00;
+  --font-weight-medium: 500;
+  --font-weight-normal: 400;
+  --font-weight-bold: 700;
+  --chart-1: #FF7A00;
+  --chart-2: #00A86B;
+  --chart-3: #6C4DFF;
+  --chart-4: #1477FF;
+  --chart-5: #8A8A8A;
+  --sidebar: #111111;
+  --sidebar-foreground: #ffffff;
+  --sidebar-primary: #FF7A00;
+  --sidebar-primary-foreground: #ffffff;
+  --sidebar-accent: #444444;
+  --sidebar-accent-foreground: #ffffff;
+  --sidebar-border: #444444;
+  --sidebar-ring: #FF7A00;
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-input-background: var(--input-background);
+  --color-switch-background: var(--switch-background);
+  --color-ring: var(--ring);
+  --color-chart-1: var(--chart-1);
+  --color-chart-2: var(--chart-2);
+  --color-chart-3: var(--chart-3);
+  --color-chart-4: var(--chart-4);
+  --color-chart-5: var(--chart-5);
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
+  --color-sidebar: var(--sidebar);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar-primary: var(--sidebar-primary);
+  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-sidebar-ring: var(--sidebar-ring);
+  
+  /* RAVYZ Utility Classes */
+  --color-ravyz-orange: var(--ravyz-orange);
+  --color-ravyz-green: var(--ravyz-green);
+  --color-ravyz-purple: var(--ravyz-purple);
+  --color-ravyz-blue: var(--ravyz-blue);
+  --color-ravyz-black: var(--ravyz-black);
+  --color-ravyz-gray-700: var(--ravyz-gray-700);
+  --color-ravyz-gray-500: var(--ravyz-gray-500);
+  --color-ravyz-gray-200: var(--ravyz-gray-200);
+  --color-ravyz-white: var(--ravyz-white);
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+
+  body {
+    @apply bg-background text-foreground;
+    font-family: 'Inter', sans-serif;
+  }
+}
+
+/**
+ * Base typography. This is not applied to elements which have an ancestor with a Tailwind text class.
+ */
+@layer base {
+  :where(:not(:has([class*=" text-"]), :not(:has([class^="text-"])))) {
+    h1 {
+      font-size: var(--text-2xl);
+      font-weight: var(--font-weight-bold);
+      line-height: 1.2;
+    }
+
+    h2 {
+      font-size: var(--text-xl);
+      font-weight: var(--font-weight-bold);
+      line-height: 1.3;
+    }
+
+    h3 {
+      font-size: var(--text-lg);
+      font-weight: var(--font-weight-bold);
+      line-height: 1.4;
+    }
+
+    h4 {
+      font-size: var(--text-base);
+      font-weight: var(--font-weight-medium);
+      line-height: 1.5;
+    }
+
+    p {
+      font-size: var(--text-base);
+      font-weight: var(--font-weight-normal);
+      line-height: 1.5;
+    }
+
+    label {
+      font-size: var(--text-base);
+      font-weight: var(--font-weight-medium);
+      line-height: 1.5;
+    }
+
+    button {
+      font-size: var(--text-base);
+      font-weight: var(--font-weight-medium);
+      line-height: 1.5;
+    }
+
+    input {
+      font-size: var(--text-base);
+      font-weight: var(--font-weight-normal);
+      line-height: 1.5;
+    }
+  }
+}
+
+html {
+  font-size: var(--font-size);
+}
+
+/* Custom RAVYZ utility classes */
+.text-ravyz-orange { color: var(--ravyz-orange); }
+.text-ravyz-green { color: var(--ravyz-green); }
+.text-ravyz-purple { color: var(--ravyz-purple); }
+.text-ravyz-blue { color: var(--ravyz-blue); }
+.text-ravyz-black { color: var(--ravyz-black); }
+.text-ravyz-gray-700 { color: var(--ravyz-gray-700); }
+.text-ravyz-gray-500 { color: var(--ravyz-gray-500); }
+.text-ravyz-gray-200 { color: var(--ravyz-gray-200); }
+.text-ravyz-white { color: var(--ravyz-white); }
+
+.bg-ravyz-orange { background-color: var(--ravyz-orange); }
+.bg-ravyz-green { background-color: var(--ravyz-green); }
+.bg-ravyz-purple { background-color: var(--ravyz-purple); }
+.bg-ravyz-blue { background-color: var(--ravyz-blue); }
+.bg-ravyz-black { background-color: var(--ravyz-black); }
+.bg-ravyz-gray-700 { background-color: var(--ravyz-gray-700); }
+.bg-ravyz-gray-500 { background-color: var(--ravyz-gray-500); }
+.bg-ravyz-gray-200 { background-color: var(--ravyz-gray-200); }
+.bg-ravyz-white { background-color: var(--ravyz-white); }
+
+.border-ravyz-orange { border-color: var(--ravyz-orange); }
+.border-ravyz-green { border-color: var(--ravyz-green); }
+.border-ravyz-purple { border-color: var(--ravyz-purple); }
+.border-ravyz-blue { border-color: var(--ravyz-blue); }
+.border-ravyz-gray-200 { border-color: var(--ravyz-gray-200); }

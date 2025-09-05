@@ -1,0 +1,41 @@
+  return (
+    <div className="space-y-6">
+      <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
+        <TabsList className="grid w-full grid-cols-4">
+          <TabsTrigger value="dashboard" className="flex items-center gap-2">
+            <BarChart3 className="w-4 h-4" />
+            Dashboard
+          </TabsTrigger>
+          <TabsTrigger value="profile" className="flex items-center gap-2">
+            <User className="w-4 h-4" />
+            Perfil
+          </TabsTrigger>
+          <TabsTrigger value="feedback" className="flex items-center gap-2">
+            <MessageSquare className="w-4 h-4" />
+            Avaliações
+          </TabsTrigger>
+          <TabsTrigger value="jobs" className="flex items-center gap-2">
+            <Briefcase className="w-4 h-4" />
+            Vagas
+          </TabsTrigger>
+        </TabsList>
+
+        <TabsContent value="dashboard" className="mt-6">
+          {renderDashboard()}
+        </TabsContent>
+
+        <TabsContent value="profile" className="mt-6">
+          {renderProfile()}
+        </TabsContent>
+
+        <TabsContent value="feedback" className="mt-6">
+          <CandidateFeedback candidateData={candidate} />
+        </TabsContent>
+
+        <TabsContent value="jobs" className="mt-6">
+          {renderJobs()}
+        </TabsContent>
+      </Tabs>
+    </div>
+  );
+}

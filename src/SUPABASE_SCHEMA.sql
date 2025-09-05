@@ -1,0 +1,14 @@
+-- ⚠️ ARQUIVO OBSOLETO ⚠️
+--
+-- Este arquivo foi removido e substituído por:
+-- SUPABASE_SCHEMA_OPTIMIZED.sql
+--
+-- Use apenas o arquivo otimizado que contém:
+-- ✅ Integração com Supabase Auth
+-- ✅ Row Level Security (RLS) completo
+-- ✅ Tipos de dados PostgreSQL otimizados
+-- ✅ Índices de performance
+-- ✅ Triggers e funções automáticas
+-- ✅ Pronto para produção
+--
+-- Este arquivo será removido na próxima versão.

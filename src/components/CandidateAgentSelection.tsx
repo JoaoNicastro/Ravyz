@@ -1,0 +1,1 @@
+// Arquivo deletado - substituído por CandidateAvatarSelection.tsx
